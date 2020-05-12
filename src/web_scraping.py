@@ -94,7 +94,7 @@ def get_reviews_ids(soup):
 
     if items:
         reviews_ids = [x.attrs['data-reviewid'] for x in items][::2] # mini test
-        reviews_ids = [x.attrs['data-reviewid'] for x in items][0:10000:1] # get 10,000 reviews
+        # reviews_ids = [x.attrs['data-reviewid'] for x in items][0:10000:1] # get 10,000 reviews
         # reviews_ids = [x.attrs['data-reviewid'] for x in items][::1] # get all reviews
         print('[get_reviews_ids] data-reviewid:', reviews_ids)
         return reviews_ids
@@ -144,6 +144,7 @@ def parse_reviews(session, url):
     for idx, review in enumerate(soup.find_all('div', class_='reviewSelector')):
 
         badgets = review.find_all('span', class_='badgetext')
+        # print(badgets)
         if len(badgets) > 0:
             contributions = badgets[0].text
         else:
@@ -163,14 +164,18 @@ def parse_reviews(session, url):
         bubble_rating = int(bubble_rating[1].split('_')[-1])/10
         # print(bubble_rating)
 
+        review_id = reviews_ids[idx]
+
         item = {
             'hotel_name': hotel_name,
             'review_body': review.find('p', class_='partial_entry').text,
             'review_date': review.find('span', class_='ratingDate')['title'], # 'ratingDate' instead of 'relativeDate'
             'rating': bubble_rating,
-            'contributions': contributions,
+            # 'contributions': contributions,
             'helpful_vote': helpful_vote,
-            'user_location': user_loc
+            'user_location': user_loc,
+            'review_id': review_id,
+            'url': url
         }
 
         items.append(item)
@@ -183,9 +188,9 @@ def parse_reviews(session, url):
     return items
 
 def write_in_csv(items, filename='results.csv',
-                  headers=['hotel name', 'review title', 'review body',
+                  headers=['review id', 'hotel name', 'review title', 'review body',
                            'review date', 'contributions', 'helpful vote',
-                           'user name' , 'user location', 'rating'],
+                           'user name' , 'user location', 'rating', 'url'],
                   mode='w'):
 
     print('--- CSV ---')
@@ -198,29 +203,33 @@ def write_in_csv(items, filename='results.csv',
 
         csv_file.writerows(items)
 
-def main():
-    DB_COLUMN  = 'hotel_name'
-    DB_COLUMN1 = 'review_body'
-    DB_COLUMN2 = 'review_date'
-    DB_COLUMN3 = 'user_location'
-    DB_COLUMN4 = 'contributions'
-    DB_COLUMN5 = 'helpful_vote'
-    DB_COLUMN6 = 'rating'
-
-    start_urls = [
+def main(start_urls = [
         'https://www.tripadvisor.ca/Hotel_Review-g60982-d87016-Reviews-Hilton_Hawaiian_Village_Waikiki_Beach_Resort-Honolulu_Oahu_Hawaii.html',
-    ]
+    ]):
+    DB_COLUMN0  = 'review_id'
+    DB_COLUMN1  = 'url'
+    DB_COLUMN2 = 'hotel_name'
+    DB_COLUMN3 = 'review_date'
+    DB_COLUMN4 = 'review_body'
+    DB_COLUMN5 = 'user_location'
+    # DB_COLUMN6 = 'contributions'
+    DB_COLUMN7 = 'helpful_vote'
+    DB_COLUMN8 = 'rating'
+
+    start_urls = start_urls
 
     lang = 'en'
 
     headers = [ 
-        DB_COLUMN, 
+        DB_COLUMN0,
         DB_COLUMN1, 
-        DB_COLUMN2,
+        DB_COLUMN2, 
         DB_COLUMN3,
         DB_COLUMN4,
         DB_COLUMN5,
-        DB_COLUMN6
+        # DB_COLUMN6,
+        DB_COLUMN7,
+        DB_COLUMN8
     ]
 
     for url in start_urls:
@@ -235,6 +244,3 @@ def main():
             filename = url.split('Reviews-')[1][:-5] + '__' + lang
             print('filename:', filename)
             write_in_csv(items, '../data/web_scraped/' + filename + '.csv', headers, mode='w')
-
-if __name__ == "__main__":
-    main()
