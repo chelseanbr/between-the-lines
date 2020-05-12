@@ -57,9 +57,11 @@ def parse(session, url):
         print('[parse] no soup:', url)
         return
 
-    num_reviews = soup.find('span', class_='reviews_header_count').text # get text
-    num_reviews = num_reviews[1:-1] 
+    # num_reviews = soup.find('span', class_='reviews_header_count').text # get text
+    num_reviews = soup.find('span', class_='hotels-hotel-review-about-with-photos-Reviews__seeAllReviews--3PpLR').text # get text
+    # num_reviews = num_reviews[1:-1] 
     num_reviews = num_reviews.replace(',', '')
+    num_reviews = num_reviews.replace('reviews', '')
     num_reviews = int(num_reviews) # convert text into integer
     print('[parse] num_reviews ALL:', num_reviews)
 
@@ -91,7 +93,9 @@ def get_reviews_ids(soup):
     items = soup.find_all('div', attrs={'data-reviewid': True})
 
     if items:
-        reviews_ids = [x.attrs['data-reviewid'] for x in items][::2]
+        reviews_ids = [x.attrs['data-reviewid'] for x in items][::2] # mini test
+        reviews_ids = [x.attrs['data-reviewid'] for x in items][0:10000:1] # get 10,000 reviews
+        # reviews_ids = [x.attrs['data-reviewid'] for x in items][::1] # get all reviews
         print('[get_reviews_ids] data-reviewid:', reviews_ids)
         return reviews_ids
     
@@ -156,17 +160,23 @@ def parse_reviews(session, url):
             user_loc = ''
             
         bubble_rating = review.select_one('span.ui_bubble_rating')['class']
-        bubble_rating = bubble_rating[1].split('_')[-1]
+        bubble_rating = int(bubble_rating[1].split('_')[-1])/10
+        # print(bubble_rating)
 
         item = {
+            'hotel_name': hotel_name,
             'review_body': review.find('p', class_='partial_entry').text,
             'review_date': review.find('span', class_='ratingDate')['title'], # 'ratingDate' instead of 'relativeDate'
+            'rating': bubble_rating,
+            'contributions': contributions,
+            'helpful_vote': helpful_vote,
+            'user_location': user_loc
         }
 
         items.append(item)
-        print('\n--- review ---\n')
-        for key,val in item.items():
-            print(' ', key, ':', val)
+        # print('\n--- review ---\n')
+        # for key,val in item.items():
+        #     print(' ', key, ':', val)
 
     print()
 
@@ -187,30 +197,44 @@ def write_in_csv(items, filename='results.csv',
             csv_file.writeheader()
 
         csv_file.writerows(items)
-        
-DB_COLUMN   = 'review_body'
-DB_COLUMN1 = 'review_date'
 
-start_urls = [
-    'https://www.tripadvisor.ca/Hotel_Review-g60982-d87016-Reviews-Hilton_Hawaiian_Village_Waikiki_Beach_Resort-Honolulu_Oahu_Hawaii.html',
-]
+def main():
+    DB_COLUMN  = 'hotel_name'
+    DB_COLUMN1 = 'review_body'
+    DB_COLUMN2 = 'review_date'
+    DB_COLUMN3 = 'user_location'
+    DB_COLUMN4 = 'contributions'
+    DB_COLUMN5 = 'helpful_vote'
+    DB_COLUMN6 = 'rating'
 
-lang = 'en'
+    start_urls = [
+        'https://www.tripadvisor.ca/Hotel_Review-g60982-d87016-Reviews-Hilton_Hawaiian_Village_Waikiki_Beach_Resort-Honolulu_Oahu_Hawaii.html',
+    ]
 
-headers = [ 
-    DB_COLUMN, 
-    DB_COLUMN1, 
-]
+    lang = 'en'
 
-for url in start_urls:
+    headers = [ 
+        DB_COLUMN, 
+        DB_COLUMN1, 
+        DB_COLUMN2,
+        DB_COLUMN3,
+        DB_COLUMN4,
+        DB_COLUMN5,
+        DB_COLUMN6
+    ]
 
-    # get all reviews for 'url' and 'lang'
-    items = scrape(url, lang)
+    for url in start_urls:
 
-    if not items:
-        print('No reviews')
-    else:
-        # write in CSV
-        filename = url.split('Reviews-')[1][:-5] + '__' + lang
-        print('filename:', filename)
-        write_in_csv(items, filename + '.csv', headers, mode='w')
+        # get all reviews for 'url' and 'lang'
+        items = scrape(url, lang)
+
+        if not items:
+            print('No reviews')
+        else:
+            # write in CSV
+            filename = url.split('Reviews-')[1][:-5] + '__' + lang
+            print('filename:', filename)
+            write_in_csv(items, '../data/web_scraped/' + filename + '.csv', headers, mode='w')
+
+if __name__ == "__main__":
+    main()
