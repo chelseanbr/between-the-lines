@@ -150,3 +150,4 @@ def fit_pred_score_Nfold(model, X_train, y_train, X_test, test_idx, target_col, 
         model_name=model.__class__.__name__
     rmse = np.mean(np.sqrt(-cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_log_error', cv=N)))
     print(model_name + ' RMSLE, {}-fold CV on Train Data: {:0.3f}'.format(N, rmse))
+    
