@@ -204,6 +204,7 @@ def build_text_vectorizer(contents, use_tfidf=True, use_stemmer=False, max_featu
     will be limited to the `max_features` most common words in the corpus.
     '''
     Vectorizer = TfidfVectorizer if use_tfidf else CountVectorizer
+    print('Vectorizer:', Vectorizer.__name__)
 #     tokenizer = RegexpTokenizer(r"[\w']+")
     tokenizer = RegexpTokenizer(r"[a-zA-Z]+")
 #     stem = PorterStemmer().stem if use_stemmer else (lambda x: x)
@@ -221,7 +222,7 @@ def build_text_vectorizer(contents, use_tfidf=True, use_stemmer=False, max_featu
         print('No Stemmer')
 
     stop_set = set(stopwords.words('english'))
-
+    print('Max features:', max_features)
     # Closure over the tokenizer et al.
     def tokenize(text):
         tokens = tokenizer.tokenize(text)
