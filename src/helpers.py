@@ -61,8 +61,15 @@ def get_cols_of_type(df, type):
 def clean_and_prep(df):
     # # Change 'review_date' to datetime type
     # df['review_date'] = pd.to_datetime(df['review_date'])
+
+    # Drop duplicate rows
+    df.drop_duplicates(inplace=True)
     # Fill nulls for 'user_location' with 'n/a'
     df.fillna({'user_location': 'n/a'}, inplace=True)
+
+    # # Add col 'review_length' from 'review_body'
+    # df['review_length'] = df['review_body'].str.len()
+
     # Get 'City' from 'folder'
     df[['City', 'drop']] = df['folder'].str.split('-', 1, expand=True)
     df.drop(columns=['drop'], inplace=True)
