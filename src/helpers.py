@@ -11,6 +11,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import cross_val_score
 
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem.porter import PorterStemmer
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+
 
 # File reading
 
@@ -174,18 +181,60 @@ def plot_tree(tree, feature_list, out_file=None):
 
 # Modeling
 
-def fit_pred_score_Nfold(model, X_train, y_train, X_test, test_idx, target_col, N=10, model_name=None, csv=None):
+def fit_pred_score_Nfold(model, X_train, y_train, N=10, model_name=None, scoring='accuracy'):
     # Fit model
     model.fit(X_train, y_train)
-    # Predict
-    y_pred = model.predict(X_test)
-    # Create submission if csv arg passed
-    if csv is not None:
-        y_pred_df = pd.DataFrame(y_pred, index=test_idx, columns=[target_col])
-        y_pred_df.head()
-        y_pred_df.to_csv('submissions/' + csv + '.csv')
-    # Get N-fold Cross-Validation RMSE score
+    # Get N-fold Cross-Validation score
     if model_name is None:
         model_name=model.__class__.__name__
-    rmse = np.mean(np.sqrt(-cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_log_error', cv=N)))
-    print(model_name + ' RMSLE, {}-fold CV on Train Data: {:0.3f}'.format(N, rmse))
+    score = np.mean(cross_val_score(model, X_train, y_train, scoring=scoring, cv=N))
+    print(model_name + ' {}, {}-fold CV on Train Data: {:0.3f}'.format(scoring, N, score))
+
+
+# NLP
+def build_text_vectorizer(contents, use_tfidf=True, use_stemmer=False, max_features=None):
+    '''
+    Build and return a **callable** for transforming text documents to vectors,
+    as well as a vocabulary to map document-vector indices to words from the
+    corpus. The vectorizer will be trained from the text documents in the
+    `contents` argument. If `use_tfidf` is True, then the vectorizer will use
+    the Tf-Idf algorithm, otherwise a Bag-of-Words vectorizer will be used.
+    The text will be tokenized by words, and each word will be stemmed iff
+    `use_stemmer` is True. If `max_features` is not None, then the vocabulary
+    will be limited to the `max_features` most common words in the corpus.
+    '''
+    Vectorizer = TfidfVectorizer if use_tfidf else CountVectorizer
+#     tokenizer = RegexpTokenizer(r"[\w']+")
+    tokenizer = RegexpTokenizer(r"[a-zA-Z]+")
+#     stem = PorterStemmer().stem if use_stemmer else (lambda x: x)
+    if use_stemmer=='porter':  
+        stem = PorterStemmer().stem
+        print('Using PorterStemmer')
+    elif use_stemmer=='snowball':    
+        stem = SnowballStemmer('english').stem
+        print('Using SnowballStemmer')
+    elif use_stemmer=='lem':    
+        stem = WordNetLemmatizer().lemmatize
+        print('Using WordNetLemmatizer')
+    else: 
+        stem = (lambda x: x)
+        print('No Stemmer')
+
+    stop_set = set(stopwords.words('english'))
+
+    # Closure over the tokenizer et al.
+    def tokenize(text):
+        tokens = tokenizer.tokenize(text)
+        stems = [stem(token) for token in tokens if token not in stop_set]
+        return stems
+
+    vectorizer_model = Vectorizer(strip_accents='unicode', lowercase=True, 
+                                  tokenizer=tokenize, max_features=max_features)
+    vectorizer_model.fit(contents)
+    vocabulary = np.array(vectorizer_model.get_feature_names())
+
+    # Closure over the vectorizer_model's transform method.
+    def vectorizer(X):
+        return vectorizer_model.transform(X).toarray()
+
+    return vectorizer, vocabulary
