@@ -1,8 +1,9 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import os
+
 from graphviz import Source
 from sklearn.tree import export_graphviz
 from sklearn.preprocessing import OneHotEncoder
@@ -13,20 +14,29 @@ from sklearn.model_selection import cross_val_score
 
 # File reading
 
-def find_filenames(path_to_dir, suffix=None):
-    filenames = os.listdir(path_to_dir)
-    if suffix == None:
-        return [filename for filename in filenames]
-    else:
-        return [filename for filename in filenames if filename.endswith(suffix)]
+def merge_csv_mult_dir(path_to_dir):
+    # Get all folders in dir
+    folders = os.listdir(path_to_dir)
+    print('Folders:', folders)
+    # From each folder, read all CSV files
+    dfs = []
+    for folder in folders:
+    #     print(folder)
+        data_dir = path_to_dir + '/' + folder + '/'
+        csv_filenames = os.listdir(data_dir)    
+        for name in csv_filenames:
+            df = pd.read_csv(data_dir + name)
+            df['csv'] = name
+            df['folder'] = folder
+            dfs.append(df)
+    df_all = pd.concat(dfs, ignore_index=True)
+    return df_all
 
 
-# Pandas df exploration functions
+# Pandas df exploration
 
 def get_nulls(df):
-    # # print how many null values each column has, if any
-    # print('Count of Null Values per Column, if any:\n\n{}'.format(df.isnull().sum()[df.isnull().sum() > 0]))
-    # missing data
+    # Get count, pct, and type of missing data (per column)
     total = df.isnull().sum().sort_values(ascending=False)
     percent = (df.isnull().sum()/df.isnull().count()).sort_values(ascending=False)
     missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
@@ -34,19 +44,41 @@ def get_nulls(df):
     return missing_data
 
 def print_unique_ct(df):
-    # print how many unique values each column has
+    # Print how many unique values each column has
     print('Count of Unique Values per Column:\n')
     for col in df.columns:
         print('{}: {}'.format(col, len(df[col].unique())))
 
 def get_cols_of_type(df, type):
-    # print names of columns of given type
+    # Print names of columns of given type
     cols = list(df.select_dtypes(type).columns)
     print('{} Columns ({}): \n{}'.format(type, len(cols), cols))
     return cols
 
 
-# Plotting functions
+# Cleaning & preparing data
+
+def clean_and_prep(df):
+    # # Change 'review_date' to datetime type
+    # df['review_date'] = pd.to_datetime(df['review_date'])
+    # Fill nulls for 'user_location' with 'n/a'
+    df.fillna({'user_location': 'n/a'}, inplace=True)
+    # Get 'City' from 'folder'
+    df[['City', 'drop']] = df['folder'].str.split('-', 1, expand=True)
+    df.drop(columns=['drop'], inplace=True)
+    # Add 'sentiment' column mapped by 'rating'
+    df['sentiment'] = df['rating'].map({1: 'negative', 2: 'negative', 3: 'neutral', 4:'positive', 5:'positive'})
+    # Add 'sentiment' column mapped by 'sentiment'
+    df['polarity'] = df['sentiment'].map({'negative': 0, 'neutral': 0.5, 'positive': 1})
+    # Add 'sentiment_int' column mapped by 'sentiment'
+    df['sentiment_int'] = (df['polarity'] * 2).astype(int)
+    # Move 'sentiment' col to be last
+    last_col = df.pop('sentiment')
+    df.insert(df.shape[1], 'sentiment', last_col)
+    return df
+
+
+# Plotting
 
 def plot_hist(df, var, fig, ax):
     # histogram of var
@@ -150,4 +182,3 @@ def fit_pred_score_Nfold(model, X_train, y_train, X_test, test_idx, target_col, 
         model_name=model.__class__.__name__
     rmse = np.mean(np.sqrt(-cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_log_error', cv=N)))
     print(model_name + ' RMSLE, {}-fold CV on Train Data: {:0.3f}'.format(N, rmse))
-    
