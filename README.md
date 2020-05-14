@@ -9,13 +9,10 @@ https://docs.google.com/presentation/d/1l2uf6faNnBJOcEW3-zTkrklIsp8OO59qxc6GvtPD
 ## Getting the Data
 
 
-## Description of Data 
-
-
 ## EDA
 
 
-## Modeling
+## Predictive Modeling
 
 
 ## Conclusion
