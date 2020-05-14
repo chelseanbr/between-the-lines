@@ -10,6 +10,10 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+
 
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
@@ -189,6 +193,28 @@ def fit_pred_score_Nfold(model, X_train, y_train, N=10, model_name=None, scoring
         model_name=model.__class__.__name__
     score = np.mean(cross_val_score(model, X_train, y_train, scoring=scoring, cv=N))
     print(model_name + ' {}, {}-fold CV on Train Data: {:0.3f}'.format(scoring, N, score))
+    
+
+def fit_pred_score_val(model, X_train, y_train, X_val, y_val, fig, ax, vectorizer=None):
+    if vectorizer is not None:
+        X_train = vectorizer(X_train)
+        X_val = vectorizer(X_val)
+        print('Used', vectorizer.__name__)
+    model = model
+    model.fit(X_train, y_train)
+    ypred = model.predict(X_val)
+    accuracy_score(y_val, ypred)
+    print(model.__class__.__name__)
+    print(classification_report(y_val, ypred, target_names=['positive', 'neutral', 'negative']))
+    conf_mat = confusion_matrix(y_val, ypred, labels=['positive', 'neutral', 'negative'], normalize='true',)
+    sns.heatmap(conf_mat, annot=True, ax = ax); #annot=True to annotate cells
+    # labels, title and ticks
+    ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels'); 
+    ax.set_title('Confusion Matrix'); 
+    ax.xaxis.set_ticklabels(['positive', 'neutral', 'negative'])
+    ax.yaxis.set_ticklabels(['positive', 'neutral', 'negative'])
+    return fig, ax
+    
 
 
 # NLP
