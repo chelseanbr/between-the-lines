@@ -158,7 +158,7 @@ def plot_counts_bygroup(df, features, groupby, fig, axs):
     fig.tight_layout()
     return fig, axs
 
-def plot_topN_features(feature_importances, feature_list, N):
+def plot_topN_features(feature_importances, feature_list, N, fig, ax):
     # Plot the feature importance
     idxes = np.argsort(-feature_importances)
     feature_list[idxes]
@@ -168,11 +168,11 @@ def plot_topN_features(feature_importances, feature_list, N):
     feat_scores = pd.DataFrame({'Fraction of Samples Affected' : rev_sort_feature_importances[:N]},
                                index=rev_sort_feature_cols[:N])
     feat_scores = feat_scores.sort_values(by='Fraction of Samples Affected')
-    feat_scores.plot(kind='barh')
+    feat_scores.plot(kind='barh', ax=ax)
     
-    plt.title('Feature Importances', size=25)
-    plt.ylabel('Features', size=25)
-    return plt, rev_sort_feature_cols
+    ax.set_title('Feature Importances (Top {})'.format(N), size=25)
+    ax.set_ylabel('Features', size=25)
+    return fig, ax, rev_sort_feature_cols
 
 def plot_tree(tree, feature_list, out_file=None):
     # Source(plot_tree(tree, feature_list, out_file=None)) to print in Jupyter nb
