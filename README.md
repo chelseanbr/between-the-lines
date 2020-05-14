@@ -6,14 +6,19 @@ https://docs.google.com/presentation/d/1l2uf6faNnBJOcEW3-zTkrklIsp8OO59qxc6GvtPD
 ## Project Description & Motivation
 
 
-#### Data Source
+## Getting the Data
 
 
-#### Description of Data 
-
-> ## Question: Do certain companies handle having harmful cosmetic products differently?
-
-## Data Wrangling
+## Description of Data 
 
 
 ## EDA
+
+
+## Modeling
+
+
+## Conclusion
+
+
+## Next Steps
