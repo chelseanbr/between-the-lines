@@ -18,14 +18,14 @@ _____
 4. Evaluated models on accuracy and confusion matrix
 
 ## EDA
- * Whole dataset consisted of ~500,000 hotel reviews in English, 
+* Whole dataset consisted of ~500,000 hotel reviews in English, 
 each with a Tripadvisor “bubble” rating from 1 to 5
 
 ![countplot_reviews_byCity_full.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/countplot_reviews_byCity_full.png)
 
 ![boxplt_ratings_byCity_full.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/boxplt_ratings_byCity_full.png)
 
- * Added sentiment label based on hotel rating per review
+* Added sentiment label based on hotel rating per review
 
 ![countplot_ratings_full.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/countplot_ratings_full.png)
 
