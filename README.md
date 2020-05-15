@@ -5,7 +5,7 @@ https://docs.google.com/presentation/d/1l2uf6faNnBJOcEW3-zTkrklIsp8OO59qxc6GvtPD
 _____
 ## Context
 ### Imagine you rent out properties like on Airbnb.
-> How can you classify how people feel about your places to stay to reach out and improve reputation?
+> How can you classify how people feel about your rentals in order to reach out and improve reputation?
 #### Solution: Mine hotel reviews “labeled” with ratings and use them to predict sentiment.
 
 ## Summary of Process
@@ -38,12 +38,25 @@ each with a Tripadvisor “bubble” rating from 1 to 5
 ![pie_sentiments_train_undersample.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/pie_sentiments_train_undersample.png)
 * Validation set had 77k observations, test set had 96k
 
-
 ### NLP
+ * Removed English 
+stop words, digits, and 
+punctuation
+
+* Tried different stemmers/
+lemmatizers and TF-IDF
+max features
+
+* Decided to proceed with 
+TF-IDF, 
+WordNetLemmatizer,
+and 5,000 features
 
 
-## Conclusion
+## Results
 
 
 ## Next Steps
-
+* Try out model on other data like tweets in the context of hotels/places to stay
+* Explore advanced NLP/ML methods like Word2Vec, LSTM recurrent neural networks
+* Mine more data and build a hotel recommender system
