@@ -3,7 +3,13 @@
 #### Link to Presentation: 
 https://docs.google.com/presentation/d/1l2uf6faNnBJOcEW3-zTkrklIsp8OO59qxc6GvtPD8bI/edit?usp=sharing
 
-## Project Description & Motivation
+### Context:
+#### Imagine you rent out properties like on Airbnb.
+How can you classify how people feel about your places to stay to reach out and improve reputation?
+
+#### Solution: 
+Mine hotel reviews “labeled” with ratings and use them to predict sentiment.
+
 
 
 ## Getting the Data
