@@ -9,6 +9,7 @@ _____
 #### Solution: Mine hotel reviews “labeled” with ratings and use them to predict sentiment.
 
 ## Summary of Process
+![Tripadvisor_Logo_horizontal-lockup_registered_RGB.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/Tripadvisor_Logo_horizontal-lockup_registered_RGB.png) ![bs.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/bs.png)
 1. Web-scraped TripAdvisor hotel reviews
   * 2 EC2 instances ran in parallel over 2 days
   * Set up data cleaning, EDA, and modeling pipeline while scraping
@@ -39,7 +40,7 @@ each with a Tripadvisor “bubble” rating from 1 to 5
 * Validation set had 77k observations, test set had 96k
 
 ### NLP
- * Removed English 
+* Removed English 
 stop words, digits, and 
 punctuation
 
@@ -47,14 +48,21 @@ punctuation
 lemmatizers and TF-IDF
 max features
 
+![mnb_accuracy_over_feature_size.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/mnb_accuracy_over_feature_size.png)
+
 * Decided to proceed with 
 TF-IDF, 
 WordNetLemmatizer,
 and 5,000 features
 
-
 ## Results
+![confusion_matrix_final_lr_test.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/confusion_matrix_final_lr_test.png)
 
+![wordcloud_positive.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_positive.png)
+
+![wordcloud_neutral.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_neutral.png)
+
+![wordcloud_negative.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_negative.png)
 
 ## Next Steps
 * Try out model on other data like tweets in the context of hotels/places to stay
