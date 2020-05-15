@@ -4,8 +4,8 @@
 https://docs.google.com/presentation/d/1l2uf6faNnBJOcEW3-zTkrklIsp8OO59qxc6GvtPD8bI/edit?usp=sharing
 _____
 ## Context
-### Imagine you rent out properties like on Airbnb.
-> How can you classify how people feel about your rentals in order to reach out and improve reputation?
+### Imagine you rent out places to stay like on Airbnb.
+> How can you easily know how customers feel to reach out and improve reputation?
 #### Solution: Mine hotel reviews “labeled” with ratings and use them to predict sentiment.
 
 ## Summary of Process
@@ -58,11 +58,22 @@ and 5,000 features
 ## Results
 ![confusion_matrix_final_lr_test.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/confusion_matrix_final_lr_test.png)
 
+* Logistic Regression (multinomial)
+* Achieved after tuning C to 0.1 with GridSearch
+* Solver = "newton-cg"
+* 81% accuracy on validation and test data
+* Did best with WordNet Lemmatized TF-TDF on 5,000 features
+
 ![wordcloud_positive.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_positive.png)
 
 ![wordcloud_neutral.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_neutral.png)
 
 ![wordcloud_negative.png](https://github.com/chelseanbr/between-the-lines/blob/final_eda_modeling/images/wordcloud_negative.png)
+
+### Example of final model use on Airbnb review:
+> "Street noise is noticeable at the higher floors"
+* Predicted **neutral.**
+32% negative, **47% neutral,** 21% positive
 
 ## Next Steps
 * Try out model on other data like tweets in the context of hotels/places to stay
